@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  h2 {
+    text-align: center;
+  }
+  </style>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+    <script type="text/javascript">
+	  var gender_read = "";
+	  function button_click(gender) {
+		  gender_read = gender;
+		  d3.select("svg").remove();
+		  d3.select("h2").remove();
+		  d3.json("brasil_estados.json", draw);
+	  };
+      function draw(data_map) {
+      
+      /*
+        D3.js setup code
+      */
+		  x.style.display = "none";
+          "use strict";
+          var margin = 75,
+              width = 1400 - margin,
+              height = 600 - margin;
+		  
+		  var color = d3.scaleLinear()
+						.domain([0, 70, 140])
+						.range(["white", "red", "black"]);
+	
+		  d3.select("body")
+			.append("h2")
+			.text("Violência no Brasil");
+		
+		  var buttons = d3.select("body")
+						  .append("div")
+						  .attr("class", "gender_buttons")
+						  .selectAll("div")
+						  .text(function(){
+								for (var i = 0; i<3; i++){
+									if(i === 0) return "Geral";
+									else if(i === 1) return "Homens";
+									else return "Mulheres";
+								}
+						  });
+			
+			
+          var svg = d3.select("body")
+              .append("svg")
+              .attr("width", width + margin)
+              .attr("height", height + margin)
+              .append('g')
+              .attr('class','map');
+			  
+		  var projection = d3.geoMercator()
+							.scale(600)
+							.translate([width/0.96, height/2.6]);
+							
+		  var path = d3.geoPath().projection(projection);
+		  
+		  var map = svg.selectAll('path')
+					   .data(data_map.features)
+					   .enter()
+					   .append('path')
+					   .attr('d',path)
+					   .style('fill', 'white')
+					   .style('stroke', 'black')
+					   .style('stroke width', 0.5);
+					   
+		  function color_map(data){
+				var teste = data;
+				var nested = d3.nest()
+							   .key(function(d) {
+									return d.ano;
+						       }).sortKeys(d3.ascending)
+						       .key(function(d) {
+									return d.uf;
+						       })
+						       .entries(data);
+							   debugger;
+		 
+		  };
+		  
+		  
+		  function update(nested_leaf) {			
+			    svg.selectAll('path')
+				   .transition()
+				   .duration(500)
+				   .style('fill', function(d) {
+				 		for (var i = 0; i < nested_leaf.values.length; i++) {
+				 			 if (nested_leaf.values[i].key === d.properties.Name){
+				 				 return color(nested_leaf.values[i].values[0].geral);
+							 }
+						} 
+				 });
+				 d3.select('h2')
+				   .text("Violência no Brasil em " + nested_leaf.key);
+		  };
+		  
+		  function start(data) {
+		  
+			  var nested = d3.nest()
+						     .key(function(d) {
+							    	return +d.ano;
+						     })
+						     .key(function(d) {
+								    return d.uf;
+						     })
+						     .entries(data);
+							 
+			  var years = d3.range(1996, 2016);
+
+			  var year_index = 0;
+			  
+			  var year_interval = setInterval(function() {
+					update(nested[year_index]);
+					
+					year_index++;
+					
+					if(year_index >= years.length) {
+						clearInterval(year_interval);
+						x.style.display = "block";
+					}
+			  }, 1000);
+			  
+		  };		  
+		  
+		  
+		  d3.tsv("taxa_homicidios.txt", start)
+			.row(function(d) {
+				return {
+					uf: d.uf,
+					ano: +d.ano,
+					geral: +d.geral,
+					homens: +d.homens,
+					mulheres: +d.mulheres
+				};
+			});
+
+		};
+      </script>
+  </head>
+<body>
+  <div id="buttons">
+	  <input name="updateButton" 
+		     type="button" 
+		     value="Geral" 
+		     onclick="button_click('geral')" />
+	  <input name="updateButton" 
+		     type="button" 
+		     value="Homens" 
+		     onclick="button_click('homens')" />
+	  <input name="updateButton" 
+		     type="button" 
+		     value="Mulheres" 
+		     onclick="button_click('mulheres')" />
+  </div>
+  <script type="text/javascript">
+  /*
+    Use D3 to load the TSV file
+    and pass the contents of it to the draw function
+    */
+  d3.json("brasil_estados.json", draw);
+  var x = document.getElementById("buttons");
+  </script>
+</body>
+</html>
