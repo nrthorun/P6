@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+  h2 {
+    text-align: center;
+  }
+  path:hover {
+	fill-opacity: .7;
+  }
+  div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 65px;
+    height: 12px;
+    padding: 8px;
+    line-height: 1;
+	font: 12px sans-serif;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+    border: 0px;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .button rect {
+  stroke: #999faa; /* navy 40% */
+  stroke-width: 2px;
+  }
+
+  .button rect.pressed {
+    fill: #000f2b; /* navy 100% */
+  }
+
+  .button #gradient-start {
+    stop-color: #999faa; /* navy 40% */
+    stop-opacity: 1;
+  }
+
+  .button #gradient-stop {
+    stop-color: #4d576b; /* navy 70% */
+    stop-opacity: 1;
+  }
+
+  .button #gradient-start.active, .button #gradient-start.pressed {
+    stop-color: #4d576b; /* navy 70% */
+  }
+
+  .button #gradient-stop.active, .button #gradient-stop.pressed {
+    stop-color: #000f2b; /* navy 100% */
+  }
+
+  .button text {
+    font-size: 16px;
+    fill: #eee;
+    pointer-events: none;
+    text-anchor: middle;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+  </style>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script src="d3.button.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script type="text/javascript">
+	var gender_read = "";
+	var nested = [];
+	
+    function draw(data_map) {
+      
+    /*
+      D3.js setup code
+    */
+		"use strict";
+		var margin = 75,
+			width = 1400 - margin,
+			height = 600 - margin;
+		  
+		var color = d3.scaleLinear()
+		    .domain([0, 50, 100])
+			.range(["white", "red", "black"]);
+			
+		var button = d3.button()
+			.on('press', function(d, i) { 
+					console.log("Pressed", d, i, this.parentNode);
+					button_click(this.__data__.label);
+				})
+			.on('release', function(d, i) { console.log("Released", d, i, this.parentNode)});
+			
+		//var button2 = d3.button()
+		//	.on('press', function(d, i) { 
+		//			console.log("Pressed", d, i, this.parentNode);
+		//			update(nested[this.__data__.label]);
+		//		})
+		//	.on('release', function(d, i) { console.log("Released", d, i, this.parentNode)});
+
+		d3.select("body")
+		  .append("h2")
+       	    .text("Mapa da Violência");
+			
+		var div = d3.select("body").append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 0);
+			  
+		var svg = d3.select("body")
+		  .append("svg")
+			.attr("width", width + margin)
+			.attr("height", height + margin)
+		  .append('g')
+			.attr('class','map');
+		  
+		var projection = d3.geoMercator()
+			.scale(600)
+			.translate([width/0.96, height/2.6]);
+							
+		var path = d3.geoPath().projection(projection);
+		  
+		var map = svg.selectAll('path')
+			.data(data_map.features)
+			.enter()
+		  .append('path')
+			.attr('d',path)
+			.style('fill', 'black')
+			.style('stroke', 'black')
+			.style('stroke width', 0.5);
+		  
+		  
+		function update(nested_leaf) {
+		  
+		    svg.selectAll("text").remove();
+
+			svg.selectAll('path')
+				.transition()
+				.duration(500)
+				.style('fill', function(d) {
+					for (var i = 0; i < nested_leaf.values.length; i++) {
+						if (nested_leaf.values[i].key === d.properties.Name){
+							if (gender_read === "Homens") return color(nested_leaf.values[i].values[0].homens)
+							else if (gender_read === "Mulheres") return color(nested_leaf.values[i].values[0].mulheres)
+							else return color(nested_leaf.values[i].values[0].geral)
+						}
+					} 
+				})
+				.attr("v", function(d) {
+					for (var i = 0; i < nested_leaf.values.length; i++) {
+						if (nested_leaf.values[i].key === d.properties.Name){
+							if (gender_read === "Homens") return nested_leaf.values[i].values[0].homens
+							else if (gender_read === "Mulheres") return nested_leaf.values[i].values[0].mulheres
+							else return nested_leaf.values[i].values[0].geral
+						}
+					} 
+				});
+				 
+			svg.selectAll('path')
+				.attr("class", "tip")
+				.on("mouseover", function(d) {
+				    div.transition()
+					    .duration(200)
+					    .style("opacity", .9);
+				    div.html("<strong>" + d.properties.Name + "</strong>" + ": " + "<strong><span style='color:red'>" + d3.select(this).attr('v') + "</span></strong>")
+					    .style("left", (d3.event.pageX) + "px")
+					    .style("top", (d3.event.pageY - 25) + "px");
+				})
+				.on("mouseout", function(d) {
+					div.transition()
+					   .duration(500)
+					   .style("opacity", 0);
+				});
+				 
+			svg.append("text")
+				.attr("x", (width / 2.2))             
+				.attr("y", (height / 1.2))
+				.attr("text-anchor", "center")  
+				.style("font-size", "40px")  
+				.text(nested_leaf.key);	
+
+		};
+		  
+	    function start(data) {
+	  
+		    nested = d3.nest()
+			    .key(function(d) {
+					return +d.ano;
+			    })
+			    .key(function(d) {
+					return d.uf;
+			    })
+			    .entries(data);
+
+			var button_width = 	0;			
+			var gender_buttons = [{label: "Geral", x: 800 - 70, y: (height / 8) - 20 },
+						{label: "Homens", x: 800, y: (height / 8) - 20 },
+						{label: "Mulheres", x: 800 + 80, y: (height / 8) - 20 }];			
+			for (var i = 1996; i < 2016 ; i++) {
+				gender_buttons.push({label: i, x: 200 + button_width, y: height / 5})
+				button_width = button_width + 55;
+			}
+			
+			var years = d3.range(1996, 2016);
+		    var year_index = 0;
+		  
+		    var year_interval = setInterval(function() {
+				update(nested[year_index]);
+				year_index++;
+				if(year_index >= years.length) {
+					clearInterval(year_interval);
+
+					var buttons = svg.selectAll('.button')
+						.data(gender_buttons)
+						.enter()
+					  .append('g')
+						.attr('class', 'button')
+						.call(button);
+					
+					//var buttons = svg.selectAll('button2')
+					//	.data(button_list)
+					//	.enter()
+					 // .append('g')
+					//	.attr('class', 'button2 button') 
+					//	.call(button2);
+
+				}
+		    }, 1000);
+		  
+	    };		  
+		function button_click(gender) {
+			if (gender == "Geral" || gender == "Homens" || gender == "Mulheres") {
+				gender_read = gender;
+				d3.select("svg").remove();
+				d3.select("h2").remove();
+				d3.json("brasil_estados.json", draw);
+			} else {
+				var index = +gender;
+				index = index - 1996;
+				update(nested[index]);
+			}
+		
+	};  
+		  
+	    d3.tsv("taxa_homicidios.txt", start)
+		    .row(function(d) {
+			    return {
+				  uf: d.uf,
+			      ano: +d.ano,
+				  geral: +d.geral,
+				  homens: +d.homens,
+				  mulheres: +d.mulheres
+			    };
+			});
+
+	};
+      </script>
+  </head>
+<body>
+  <script type="text/javascript">
+  /*
+    Use D3 to load the TSV file
+    and pass the contents of it to the draw function
+    */
+  d3.json("brasil_estados.json", draw);
+  </script>
+</body>
+</html>
