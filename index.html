@@ -4,6 +4,7 @@
   <style type="text/css">
   h2 {
     text-align: center;
+	font-family: sans-serif;
   }
   path:hover {
 	fill-opacity: .7;
@@ -23,50 +24,31 @@
     border-radius: 2px;
     pointer-events: none;
   }
-  .button rect {
-  stroke: #999faa; /* navy 40% */
-  stroke-width: 2px;
+  .button_rect {
+    fill: lightgray;
+	opacity: 0.3;
+	border-radius: 5px;
   }
-
-  .button rect.pressed {
-    fill: #000f2b; /* navy 100% */
+  rect:hover {
+	fill: gray;
   }
-
-  .button #gradient-start {
-    stop-color: #999faa; /* navy 40% */
-    stop-opacity: 1;
+  text {
+	font-family: sans-serif;
   }
-
-  .button #gradient-stop {
-    stop-color: #4d576b; /* navy 70% */
-    stop-opacity: 1;
-  }
-
-  .button #gradient-start.active, .button #gradient-start.pressed {
-    stop-color: #4d576b; /* navy 70% */
-  }
-
-  .button #gradient-stop.active, .button #gradient-stop.pressed {
-    stop-color: #000f2b; /* navy 100% */
-  }
-
-  .button text {
-    font-size: 16px;
-    fill: #eee;
-    pointer-events: none;
-    text-anchor: middle;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
+  .axis path,
+  .axis tick,
+  .axis line {
+	fill: none;
+	stroke: none;
   }
   </style>
   <meta charset="utf-8">
   <script src="http://d3js.org/d3.v4.min.js"></script>
-  <script src="d3.button.js"></script>
   <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <script type="text/javascript">
-	var gender_read = "";
+	var gender_read = "Geral";
+	var year_read = 2015;
 	var nested = [];
 	
     function draw(data_map) {
@@ -76,27 +58,13 @@
     */
 		"use strict";
 		var margin = 75,
-			width = 1400 - margin,
-			height = 600 - margin;
+			width = 1400,
+			height = 600;
 		  
 		var color = d3.scaleLinear()
 		    .domain([0, 50, 100])
 			.range(["white", "red", "black"]);
 			
-		var button = d3.button()
-			.on('press', function(d, i) { 
-					console.log("Pressed", d, i, this.parentNode);
-					button_click(this.__data__.label);
-				})
-			.on('release', function(d, i) { console.log("Released", d, i, this.parentNode)});
-			
-		//var button2 = d3.button()
-		//	.on('press', function(d, i) { 
-		//			console.log("Pressed", d, i, this.parentNode);
-		//			update(nested[this.__data__.label]);
-		//		})
-		//	.on('release', function(d, i) { console.log("Released", d, i, this.parentNode)});
-
 		d3.select("body")
 		  .append("h2")
        	    .text("Mapa da Violência");
@@ -104,17 +72,25 @@
 		var div = d3.select("body").append("div")
 			.attr("class", "tooltip")
 			.style("opacity", 0);
+		
+		var menu = d3.select("body")
+		  .append("svg")
+			.attr("width", width)
+			.attr("height", (height)/6)
+		  .append('g')
+		    .attr('class', 'menu');
 			  
 		var svg = d3.select("body")
 		  .append("svg")
-			.attr("width", width + margin)
-			.attr("height", height + margin)
+			.attr('class','svg')
+			.attr("width", width)
+			.attr("height", height)
 		  .append('g')
 			.attr('class','map');
 		  
 		var projection = d3.geoMercator()
 			.scale(600)
-			.translate([width/0.96, height/2.6]);
+			.translate([width, height/4]);
 							
 		var path = d3.geoPath().projection(projection);
 		  
@@ -126,11 +102,68 @@
 			.style('fill', 'black')
 			.style('stroke', 'black')
 			.style('stroke width', 0.5);
-		  
-		  
+
+		var key = d3.select(".svg")
+		  .append("g")
+			.attr("class", "legendWrapper")
+			.attr("transform", "translate(" + (width-width/4) + "," + (height/6) + ")");
+
+
+			var legend = key.append("defs")
+			  .append("svg:linearGradient")
+			    .attr("id", "gradient")
+				.attr("x1", "0%")
+				.attr("y1", "0%")
+				.attr("x2", "100%")
+				.attr("y2", "0%")
+				.attr("spreadMethod", "pad");
+
+			legend.append("stop")
+				.attr("offset", "0%")
+				.attr("stop-color", "oldlace")
+				.attr("stop-opacity", 1);
+				
+			legend.append("stop")
+				.attr("offset", "50%")
+				.attr("stop-color", "red")
+				.attr("stop-opacity", 1);
+				
+			legend.append("stop")
+				.attr("offset", "100%")
+				.attr("stop-color", "black")
+				.attr("stop-opacity", 1);
+
+			key.append("rect")
+				.attr("width", width/8)
+				.attr("height", height/40)
+				.style("fill", "url(#gradient)")
+				.attr("transform", "translate(0,10)");
+			
+			key.append("text")
+				.attr("class", "legendTitle")
+				.attr("x", 5)
+				.attr("y", 0)
+				.style("font-size", "12px")
+				.text("Homicídios/100 mil Habitantes");
+				
+			var xScale = d3.scaleLinear()
+				.range([0, width/8])
+				.domain([0,100]);
+				
+			//Define x-axis
+			var xAxis = d3.axisBottom()
+				.ticks(5)  //Set rough # of ticks
+				.scale(xScale);
+
+			//Set up X axis
+			key.append("g")
+				.attr("class", "axis")  //Assign "axis" class
+				.attr("transform", "translate(" + 0 + "," + 22 + ")")
+				.call(xAxis);
+
 		function update(nested_leaf) {
 		  
-		    svg.selectAll("text").remove();
+			svg.selectAll("text").remove();
 
 			svg.selectAll('path')
 				.transition()
@@ -153,26 +186,16 @@
 						}
 					} 
 				});
-				 
-			svg.selectAll('path')
-				.attr("class", "tip")
-				.on("mouseover", function(d) {
-				    div.transition()
-					    .duration(200)
-					    .style("opacity", .9);
-				    div.html("<strong>" + d.properties.Name + "</strong>" + ": " + "<strong><span style='color:red'>" + d3.select(this).attr('v') + "</span></strong>")
-					    .style("left", (d3.event.pageX) + "px")
-					    .style("top", (d3.event.pageY - 25) + "px");
-				})
-				.on("mouseout", function(d) {
-					div.transition()
-					   .duration(500)
-					   .style("opacity", 0);
+					
+			menu.selectAll('rect')
+				.style('fill', function(d) {
+					if (d.label === gender_read) return 'gray';
+					if (d.label === year_read) return 'gray';
 				});
-				 
+			
 			svg.append("text")
 				.attr("x", (width / 2.2))             
-				.attr("y", (height / 1.2))
+				.attr("y", (height / 1.5))
 				.attr("text-anchor", "center")  
 				.style("font-size", "40px")  
 				.text(nested_leaf.key);	
@@ -191,54 +214,112 @@
 			    .entries(data);
 
 			var button_width = 	0;			
-			var gender_buttons = [{label: "Geral", x: 800 - 70, y: (height / 8) - 20 },
-						{label: "Homens", x: 800, y: (height / 8) - 20 },
-						{label: "Mulheres", x: 800 + 80, y: (height / 8) - 20 }];			
+			var gender_buttons = [{label: "Geral", x: (width/2)-3, y: height/60},
+				{label: "Homens", x: (width/2)+82, y: height/60 },
+				{label: "Mulheres", x: (width/2)+167, y: height/60 }];			
 			for (var i = 1996; i < 2016 ; i++) {
-				gender_buttons.push({label: i, x: 200 + button_width, y: height / 5})
+				gender_buttons.push({label: i, x: 250 + button_width, y: 70})
 				button_width = button_width + 55;
 			}
 			
 			var years = d3.range(1996, 2016);
 		    var year_index = 0;
+
+			
 		  
 		    var year_interval = setInterval(function() {
 				update(nested[year_index]);
 				year_index++;
 				if(year_index >= years.length) {
-					clearInterval(year_interval);
-
-					var buttons = svg.selectAll('.button')
+					clearInterval(year_interval);		
+					
+					var buttons_text = menu.selectAll('g')
 						.data(gender_buttons)
 						.enter()
-					  .append('g')
-						.attr('class', 'button')
-						.call(button);
-					
-					//var buttons = svg.selectAll('button2')
-					//	.data(button_list)
-					//	.enter()
-					 // .append('g')
-					//	.attr('class', 'button2 button') 
-					//	.call(button2);
-
+					  .append('text')
+					    .attr('class', 'button_text')
+						.attr('x', function(d) {
+							if (d.label === "Geral") {
+								return d.x+19;
+							} else if (d.label === "Homens") {
+								return d.x+10;
+							} else return d.x+7;
+						})
+						.attr('y', function(d) {
+							return d.y+21;
+						})
+						.text(function(d){
+							return d.label;
+						}).on('click', function(d) {
+							button_click(d.label);
+						});	
+			
+			
+					var buttons_rect = menu.selectAll('g')
+						.data(gender_buttons)
+						.enter()
+					  .append('rect')
+						.attr('class', 'button_rect')
+						.attr('width', function(d){
+							if (d.label === "Geral" || d.label === "Homens" || d.label === "Mulheres") {
+								return 80;
+							} else return 50;
+								
+						})
+						.attr('height', 30)
+						.attr("rx", 5)
+						.attr("ry", 5)
+						.attr('x', function(d) {
+							return d.x;
+						})
+						.attr('y', function(d) {
+							return d.y;
+						})
+						.style('fill', function(d) {
+							if (d.label === gender_read) return 'gray';
+							if (d.label === year_read) return 'gray';
+						})
+						.on('click', function(d) {
+							button_click(d.label);
+						});	
+						
+			
+					svg.selectAll('path')
+						.attr("class", "tip")
+						.on("mouseover", function(d) {
+							div.transition()
+								.duration(400)
+								.style("opacity", .9);
+							div.html("<strong>" + d.properties.Name + "</strong>" + ": " + "<strong><span style='color:red'>" + d3.select(this).attr('v').substr(0,5) + "</span></strong>")
+								.style("left", (d3.event.pageX) + "px")
+								.style("top", (d3.event.pageY - 25) + "px");
+						})
+						.on("mouseout", function(d) {
+							div.transition()
+							   .duration(500)
+							   .style("opacity", 0);
+						});
+						
 				}
 		    }, 1000);
 		  
-	    };		  
-		function button_click(gender) {
-			if (gender == "Geral" || gender == "Homens" || gender == "Mulheres") {
-				gender_read = gender;
-				d3.select("svg").remove();
+	    };		
+		
+		function button_click(option) {
+			if (option === "Geral" || option === "Homens" || option === "Mulheres") {
+				gender_read = option;
+				year_read = 2015;
+				d3.selectAll("svg").remove();
 				d3.select("h2").remove();
 				d3.json("brasil_estados.json", draw);
 			} else {
-				var index = +gender;
+				var index = +option;
 				index = index - 1996;
+				year_read = option;
 				update(nested[index]);
 			}
 		
-	};  
+		};  
 		  
 	    d3.tsv("taxa_homicidios.txt", start)
 		    .row(function(d) {
