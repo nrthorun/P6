@@ -50,40 +50,36 @@
 	var gender_read = "Geral";
 	var year_read = 2015;
 	var nested = [];
-	var count = 0;
 	
     function draw(data_map) {
       
+    /*
+      D3.js setup code
+    */
 		"use strict";
-		// svg size
 		var margin = 75,
 			width = 1400,
 			height = 600;
-		 
-		// color scale
+		  
 		var color = d3.scaleLinear()
 		    .domain([0, 50, 100])
 			.range(["white", "red", "black"]);
-		
-		// title		
+			
 		d3.select("body")
 		  .append("h2")
-       	    .text("Mapa da Morte (Homicídios)");
-		
-		// div for the tooltip - when hover over the map
+       	    .text("Mapa da Violência");
+			
 		var div = d3.select("body").append("div")
 			.attr("class", "tooltip")
 			.style("opacity", 0);
 		
-		// appends the menu svg to the page
 		var menu = d3.select("body")
 		  .append("svg")
 			.attr("width", width)
 			.attr("height", (height)/6)
 		  .append('g')
 		    .attr('class', 'menu');
-		
-		// appends the map svg to the page, groups the map inside g
+			  
 		var svg = d3.select("body")
 		  .append("svg")
 			.attr('class','svg')
@@ -92,15 +88,12 @@
 		  .append('g')
 			.attr('class','map');
 		  
-		// sets the projection as marcator, scales and position it inside the map svg
 		var projection = d3.geoMercator()
 			.scale(600)
 			.translate([width, height/4]);
-		
-		// sets the paths of the projection
+							
 		var path = d3.geoPath().projection(projection);
-		
-		// loads map and appends the path attr on it
+		  
 		var map = svg.selectAll('path')
 			.data(data_map.features)
 			.enter()
@@ -110,11 +103,11 @@
 			.style('stroke', 'black')
 			.style('stroke width', 0.5);
 
-		// the next few chunks are all about setting the legend next to the map
 		var key = d3.select(".svg")
 		  .append("g")
 			.attr("class", "legendWrapper")
 			.attr("transform", "translate(" + (width-width/4) + "," + (height/6) + ")");
+
 
 			var legend = key.append("defs")
 			  .append("svg:linearGradient")
@@ -157,27 +150,24 @@
 				.range([0, width/8])
 				.domain([0,100]);
 				
+			//Define x-axis
 			var xAxis = d3.axisBottom()
 				.ticks(5)  //Set rough # of ticks
 				.scale(xScale);
 
+			//Set up X axis
 			key.append("g")
 				.attr("class", "axis")  //Assign "axis" class
 				.attr("transform", "translate(" + 0 + "," + 22 + ")")
 				.call(xAxis);
 
-		/*
-			function called at every year change
-		*/
 		function update(nested_leaf) {
-		    // removes the text on svg showing the year
-			svg.selectAll(".year").remove();
-			
-			// sets the respective values of each state (path) 
-			// sets path attribute 'v' with the homicide rate value for each state - to be used by the tooltip
+		  
+			svg.selectAll("text").remove();
+
 			svg.selectAll('path')
 				.transition()
-				.duration(250)
+				.duration(500)
 				.style('fill', function(d) {
 					for (var i = 0; i < nested_leaf.values.length; i++) {
 						if (nested_leaf.values[i].key === d.properties.Name){
@@ -196,17 +186,14 @@
 						}
 					} 
 				});
-			
-			// highlights the selected options on the menu
+					
 			menu.selectAll('rect')
 				.style('fill', function(d) {
 					if (d.label === gender_read) return 'gray';
 					if (d.label === year_read) return 'gray';
 				});
 			
-			// appends year text on the svg
 			svg.append("text")
-				.attr("class", "year")
 				.attr("x", (width / 2.2))             
 				.attr("y", (height / 1.5))
 				.attr("text-anchor", "center")  
@@ -214,40 +201,9 @@
 				.text(nested_leaf.key);	
 
 		};
-		 
-		/*
-			function called at the start of each animation
-			each gender button calls the animation again
-		*/
+		  
 	    function start(data) {
-			// increments the count variable at every animation
-			count = count + 1;
-			// sets a 'skip animation' button to be showed if the animation has been seen once
-			if (count > 1 ) {
-				d3.select(".svg")
-				  .append("text")
-				    .attr("class", "skip")
-					.attr('x', 260)
-					.attr('y', 41)
-				    .text("Pular animação");
-					
-				d3.select('.svg')
-				  .append('rect')
-					.attr('class', 'skip button_rect')
-					.attr('width', 130)
-					.attr('height', 30)
-					.attr("rx", 5)
-					.attr("ry", 5)
-					.attr('x', 250)
-					.attr('y', 20)
-					.on('click', function(d) {
-						clearInterval(year_interval);
-						button_click("2015");
-						set_menu();
-					});		
-			}
-			
-			// groups the information for every year
+	  
 		    nested = d3.nest()
 			    .key(function(d) {
 					return +d.ano;
@@ -256,30 +212,99 @@
 					return d.uf;
 			    })
 			    .entries(data);
+
+			var button_width = 	0;			
+			var gender_buttons = [{label: "Geral", x: (width/2)-3, y: height/60},
+				{label: "Homens", x: (width/2)+82, y: height/60 },
+				{label: "Mulheres", x: (width/2)+167, y: height/60 }];			
+			for (var i = 1996; i < 2016 ; i++) {
+				gender_buttons.push({label: i, x: 250 + button_width, y: 70})
+				button_width = button_width + 55;
+			}
 			
 			var years = d3.range(1996, 2016);
 		    var year_index = 0;
 
-			// calls the update function for every year
+			
+		  
 		    var year_interval = setInterval(function() {
 				update(nested[year_index]);
 				year_index++;
-				
-				// the chunk of code below shows the menu buttons at the end of the animation
 				if(year_index >= years.length) {
 					clearInterval(year_interval);		
-					set_menu();	
-					d3.selectAll(".skip").remove();
+					
+					var buttons_text = menu.selectAll('g')
+						.data(gender_buttons)
+						.enter()
+					  .append('text')
+					    .attr('class', 'button_text')
+						.attr('x', function(d) {
+							if (d.label === "Geral") {
+								return d.x+19;
+							} else if (d.label === "Homens") {
+								return d.x+10;
+							} else return d.x+7;
+						})
+						.attr('y', function(d) {
+							return d.y+21;
+						})
+						.text(function(d){
+							return d.label;
+						}).on('click', function(d) {
+							button_click(d.label);
+						});	
+			
+			
+					var buttons_rect = menu.selectAll('g')
+						.data(gender_buttons)
+						.enter()
+					  .append('rect')
+						.attr('class', 'button_rect')
+						.attr('width', function(d){
+							if (d.label === "Geral" || d.label === "Homens" || d.label === "Mulheres") {
+								return 80;
+							} else return 50;
+								
+						})
+						.attr('height', 30)
+						.attr("rx", 5)
+						.attr("ry", 5)
+						.attr('x', function(d) {
+							return d.x;
+						})
+						.attr('y', function(d) {
+							return d.y;
+						})
+						.style('fill', function(d) {
+							if (d.label === gender_read) return 'gray';
+							if (d.label === year_read) return 'gray';
+						})
+						.on('click', function(d) {
+							button_click(d.label);
+						});	
+						
+			
+					svg.selectAll('path')
+						.attr("class", "tip")
+						.on("mouseover", function(d) {
+							div.transition()
+								.duration(400)
+								.style("opacity", .9);
+							div.html("<strong>" + d.properties.Name + "</strong>" + ": " + "<strong><span style='color:red'>" + d3.select(this).attr('v').substr(0,5) + "</span></strong>")
+								.style("left", (d3.event.pageX) + "px")
+								.style("top", (d3.event.pageY - 25) + "px");
+						})
+						.on("mouseout", function(d) {
+							div.transition()
+							   .duration(500)
+							   .style("opacity", 0);
+						});
+						
 				}
-		    }, 500);
+		    }, 1000);
 		  
 	    };		
 		
-		/*
-			function the be called at every button click on the menu
-			if its a gender change, calls start to animate again
-			if its a year change, calls the update function
-		*/
 		function button_click(option) {
 			if (option === "Geral" || option === "Homens" || option === "Mulheres") {
 				gender_read = option;
@@ -295,90 +320,7 @@
 			}
 		
 		};  
-		 
-		function set_menu() {
-		
-			// sets properties for the menu buttons
-			var button_width = 	0;			
-			var buttons_list = [{label: "Geral", x: (width/2)-3, y: height/60},
-				{label: "Homens", x: (width/2)+82, y: height/60 },
-				{label: "Mulheres", x: (width/2)+167, y: height/60 }];			
-			for (var i = 1996; i < 2016 ; i++) {
-				buttons_list.push({label: i, x: 250 + button_width, y: 70})
-				button_width = button_width + 55;
-			}
-			
-			var buttons_text = menu.selectAll('g')
-				.data(buttons_list)
-				.enter()
-			  .append('text')
-				.attr('class', 'button_text')
-				.attr('x', function(d) {
-					if (d.label === "Geral") {
-						return d.x+19;
-					} else if (d.label === "Homens") {
-						return d.x+10;
-					} else return d.x+7;
-				})
-				.attr('y', function(d) {
-					return d.y+21;
-				})
-				.text(function(d){
-					return d.label;
-				}).on('click', function(d) {
-					button_click(d.label);
-				});	
-	
-	
-			var buttons_rect = menu.selectAll('g')
-				.data(buttons_list)
-				.enter()
-			  .append('rect')
-				.attr('class', 'button_rect')
-				.attr('width', function(d){
-					if (d.label === "Geral" || d.label === "Homens" || d.label === "Mulheres") {
-						return 80;
-					} else return 50;
-						
-				})
-				.attr('height', 30)
-				.attr("rx", 5)
-				.attr("ry", 5)
-				.attr('x', function(d) {
-					return d.x;
-				})
-				.attr('y', function(d) {
-					return d.y;
-				})
-				.style('fill', function(d) {
-					if (d.label === gender_read) return 'gray';
-					if (d.label === year_read) return 'gray';
-				})
-				.on('click', function(d) {
-					button_click(d.label);
-				});	
-				
-			// calls the tooltip when hovering the paths
-			svg.selectAll('path')
-				.attr("class", "tip")
-				.on("mouseover", function(d) {
-					div.transition()
-						.duration(400)
-						.style("opacity", .9);
-					div.html("<strong>" + d.properties.Name + "</strong>" + ": " + "<strong><span style='color:red'>" + d3.select(this).attr('v').substr(0,5) + "</span></strong>")
-						.style("left", (d3.event.pageX) + "px")
-						.style("top", (d3.event.pageY - 25) + "px");
-				})
-				.on("mouseout", function(d) {
-					div.transition()
-					   .duration(500)
-					   .style("opacity", 0);
-				});
-			d3.selectAll(".skip").remove();
-		} 
-		 
-		// reads and models the txt datasheet
-		// than passes it to the start function to start the animation
+		  
 	    d3.tsv("taxa_homicidios.txt", start)
 		    .row(function(d) {
 			    return {
@@ -396,8 +338,8 @@
 <body>
   <script type="text/javascript">
   /*
-    loads the JSON file
-    and passes the contents of it to the draw function
+    Use D3 to load the TSV file
+    and pass the contents of it to the draw function
     */
   d3.json("brasil_estados.json", draw);
   </script>
