@@ -6,6 +6,7 @@ P6 - Mapa da Morte
 #### Resumo:
 
 Esta visualização apresenta as taxas de homicídio a cada 100 mil habitantes no Brasil, registradas entre 1996 e 2015.
+É mostrada, de forma clara, que as taxas são crescentes com o tempo e que a diferença entre os gêneros é enorme.
 Os dados foram retirados do 'Atlas da Violência' no site do IPEA, o Instituto de Pesquisa Econômica Aplicada (http://www.ipea.gov.br/atlasviolencia/series).
 A animação começa mostrando um mapa coroplético do Brasil, no qual a intensidade da cor indica o valor da taxa de homicídio, iterando entre os anos a cada meio segundo.
 Após o término da animação, um menu aparece com as opções de ver a animação para diferentes gêneros ou detalhar algum ano específico.
@@ -14,6 +15,7 @@ Se uma nova animação for selecionada, um botão de 'pular animação' é mostr
 #### Design:
 
 Para representar o 'mapa da morte' foi escolhido um mapa coroplético, no qual a escala de cores varia de branco a vermelho e depois a preto.
+A escala é sequencial, ou seja, conforme a taxa aumenta, os tons escurecem.
 A ideia é que estados sem homicidios ficassem brancos, estados com mais de 100 homicídios por 100 mil habitantes focassem pretos e o restante dos estados variassem entre rosa claro e vermelho escuro.
 Após os feedbacks, o título foi alterado de 'Mapa da Violência' para 'Mapa da Morte (Homicídios)', para não passar a ideia de que o mapa representava outros tipos de violência.
 

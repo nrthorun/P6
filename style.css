@@ -1,0 +1,63 @@
+svg {
+	display: block;
+	margin: auto;
+}
+h2 {
+	text-align: center;
+	font-family: sans-serif;
+}
+#left {
+	width: 1100px;
+	float: left;
+}
+#right {
+	width: 300px;
+	float: left;
+}
+path:hover {
+	fill-opacity: .7;
+}
+div.tooltip {
+	position: absolute;
+	text-align: center;
+	width: 65px;
+	height: 12px;
+	padding: 8px;
+	line-height: 1;
+	font: 12px sans-serif;
+	font-weight: bold;
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	border: 0px;
+	border-radius: 2px;
+	pointer-events: none;
+}
+.button_rect {
+	font-size: 5px;
+	fill: lightgray;
+	opacity: 0.3;
+	border-radius: 5px;
+}
+.button_text {
+	font-size: 13px;
+}
+rect:hover {
+	fill: gray;
+}
+text {
+	font-family: sans-serif;
+}
+.text {
+	text-align: center;
+	font-family: sans-serif;
+}
+.just {
+	text-align: justify;
+	font-family: sans-serif;
+}
+.axis path,
+.axis tick,
+.axis line {
+fill: none;
+stroke: none;
+}

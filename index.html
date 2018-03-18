@@ -1,101 +1,61 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <style type="text/css">
-  h2 {
-    text-align: center;
-	font-family: sans-serif;
-  }
-  path:hover {
-	fill-opacity: .7;
-  }
-  div.tooltip {
-    position: absolute;
-    text-align: center;
-    width: 65px;
-    height: 12px;
-    padding: 8px;
-    line-height: 1;
-	font: 12px sans-serif;
-    font-weight: bold;
-    background: rgba(0, 0, 0, 0.8);
-	color: #fff;
-    border: 0px;
-    border-radius: 2px;
-    pointer-events: none;
-  }
-  .button_rect {
-    fill: lightgray;
-	opacity: 0.3;
-	border-radius: 5px;
-  }
-  rect:hover {
-	fill: gray;
-  }
-  text {
-	font-family: sans-serif;
-  }
-  .axis path,
-  .axis tick,
-  .axis line {
-	fill: none;
-	stroke: none;
-  }
-  </style>
-  <meta charset="utf-8">
-  <script src="http://d3js.org/d3.v4.min.js"></script>
-  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-    <script type="text/javascript">
-	var gender_read = "Geral";
+  <head>
+    <meta charset='utf-8'>
+    <link rel='stylesheet' type='text/css' href='style.css'/>
+    <script src='http://d3js.org/d3.v4.min.js'></script>
+    <script src='https://d3js.org/d3-scale-chromatic.v1.min.js'></script>
+    <script src='http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js'></script>
+    <script type='text/javascript'>
+	var gender_read = 'Geral';
 	var year_read = 2015;
 	var nested = [];
 	var count = 0;
 	
     function draw(data_map) {
       
-		"use strict";
+		'use strict';
 		// svg size
 		var margin = 75,
-			width = 1400,
+			width = 960,
 			height = 600;
 		 
 		// color scale
 		var color = d3.scaleLinear()
 		    .domain([0, 50, 100])
-			.range(["white", "red", "black"]);
+			.range(['white', 'red', 'black']);
 		
 		// title		
-		d3.select("body")
-		  .append("h2")
-       	    .text("Mapa da Morte (Homicídios)");
+		d3.select('#left')
+		  .append('h2')
+       	    .text('Mapa da Morte (Homicídios)');
 		
 		// div for the tooltip - when hover over the map
-		var div = d3.select("body").append("div")
-			.attr("class", "tooltip")
-			.style("opacity", 0);
+		var div = d3.select('#left').append('div')
+			.attr('class', 'tooltip')
+			.style('opacity', 0);
 		
 		// appends the menu svg to the page
-		var menu = d3.select("body")
-		  .append("svg")
-			.attr("width", width)
-			.attr("height", (height)/6)
+		var menu = d3.select('#left')
+		  .append('svg')
+			.attr('width', width)
+			.attr('height', (height)/6)
 		  .append('g')
 		    .attr('class', 'menu');
 		
 		// appends the map svg to the page, groups the map inside g
-		var svg = d3.select("body")
-		  .append("svg")
+		var svg = d3.select('#left')
+		  .append('svg')
 			.attr('class','svg')
-			.attr("width", width)
-			.attr("height", height)
+			.attr('width', width)
+			.attr('height', height)
 		  .append('g')
 			.attr('class','map');
 		  
 		// sets the projection as marcator, scales and position it inside the map svg
 		var projection = d3.geoMercator()
 			.scale(600)
-			.translate([width, height/4]);
+			.translate([width+width/12, height/4]);
 		
 		// sets the paths of the projection
 		var path = d3.geoPath().projection(projection);
@@ -111,59 +71,59 @@
 			.style('stroke width', 0.5);
 
 		// the next few chunks are all about setting the legend next to the map
-		var key = d3.select(".svg")
-		  .append("g")
-			.attr("class", "legendWrapper")
-			.attr("transform", "translate(" + (width-width/4) + "," + (height/6) + ")");
+		var key = d3.select('.svg')
+		  .append('g')
+			.attr('class', 'legendWrapper')
+			.attr('transform', 'translate(' + (width-width/4) + ',' + (height/6) + ')');
 
-			var legend = key.append("defs")
-			  .append("svg:linearGradient")
-			    .attr("id", "gradient")
-				.attr("x1", "0%")
-				.attr("y1", "0%")
-				.attr("x2", "100%")
-				.attr("y2", "0%")
-				.attr("spreadMethod", "pad");
+			var legend = key.append('defs')
+			  .append('svg:linearGradient')
+			    .attr('id', 'gradient')
+				.attr('x1', '0%')
+				.attr('y1', '0%')
+				.attr('x2', '100%')
+				.attr('y2', '0%')
+				.attr('spreadMethod', 'pad');
 
-			legend.append("stop")
-				.attr("offset", "0%")
-				.attr("stop-color", "oldlace")
-				.attr("stop-opacity", 1);
+			legend.append('stop')
+				.attr('offset', '0%')
+				.attr('stop-color', 'oldlace')
+				.attr('stop-opacity', 1);
 				
-			legend.append("stop")
-				.attr("offset", "50%")
-				.attr("stop-color", "red")
-				.attr("stop-opacity", 1);
+			legend.append('stop')
+				.attr('offset', '50%')
+				.attr('stop-color', 'red')
+				.attr('stop-opacity', 1);
 				
-			legend.append("stop")
-				.attr("offset", "100%")
-				.attr("stop-color", "black")
-				.attr("stop-opacity", 1);
+			legend.append('stop')
+				.attr('offset', '100%')
+				.attr('stop-color', 'black')
+				.attr('stop-opacity', 1);
 
-			key.append("rect")
-				.attr("width", width/8)
-				.attr("height", height/40)
-				.style("fill", "url(#gradient)")
-				.attr("transform", "translate(0,10)");
+			key.append('rect')
+				.attr('width', width/5.8)
+				.attr('height', height/40)
+				.style('fill', 'url(#gradient)')
+				.attr('transform', 'translate(0,10)');
 			
-			key.append("text")
-				.attr("class", "legendTitle")
-				.attr("x", 5)
-				.attr("y", 0)
-				.style("font-size", "12px")
-				.text("Homicídios/100 mil Habitantes");
+			key.append('text')
+				.attr('class', 'legendTitle')
+				.attr('x', 2)
+				.attr('y', 0)
+				.style('font-size', '12px')
+				.text('Homicídios/100 mil Habitantes');
 				
 			var xScale = d3.scaleLinear()
-				.range([0, width/8])
+				.range([0, width/5.8])
 				.domain([0,100]);
 				
 			var xAxis = d3.axisBottom()
 				.ticks(5)  //Set rough # of ticks
 				.scale(xScale);
 
-			key.append("g")
-				.attr("class", "axis")  //Assign "axis" class
-				.attr("transform", "translate(" + 0 + "," + 22 + ")")
+			key.append('g')
+				.attr('class', 'axis')  //Assign 'axis' class
+				.attr('transform', 'translate(' + 0 + ',' + 22 + ')')
 				.call(xAxis);
 
 		/*
@@ -171,7 +131,7 @@
 		*/
 		function update(nested_leaf) {
 		    // removes the text on svg showing the year
-			svg.selectAll(".year").remove();
+			svg.selectAll('.year').remove();
 			
 			// sets the respective values of each state (path) 
 			// sets path attribute 'v' with the homicide rate value for each state - to be used by the tooltip
@@ -181,18 +141,18 @@
 				.style('fill', function(d) {
 					for (var i = 0; i < nested_leaf.values.length; i++) {
 						if (nested_leaf.values[i].key === d.properties.Name){
-							if (gender_read === "Homens") return color(nested_leaf.values[i].values[0].homens)
-							else if (gender_read === "Mulheres") return color(nested_leaf.values[i].values[0].mulheres)
-							else return color(nested_leaf.values[i].values[0].geral)
+							if (gender_read === 'Homens') return color(nested_leaf.values[i].values[0].homens);
+							else if (gender_read === 'Mulheres') return color(nested_leaf.values[i].values[0].mulheres);
+							else return color(nested_leaf.values[i].values[0].geral);
 						}
 					} 
 				})
-				.attr("v", function(d) {
+				.attr('v', function(d) {
 					for (var i = 0; i < nested_leaf.values.length; i++) {
 						if (nested_leaf.values[i].key === d.properties.Name){
-							if (gender_read === "Homens") return nested_leaf.values[i].values[0].homens
-							else if (gender_read === "Mulheres") return nested_leaf.values[i].values[0].mulheres
-							else return nested_leaf.values[i].values[0].geral
+							if (gender_read === 'Homens') return nested_leaf.values[i].values[0].homens;
+							else if (gender_read === 'Mulheres') return nested_leaf.values[i].values[0].mulheres;
+							else return nested_leaf.values[i].values[0].geral;
 						}
 					} 
 				});
@@ -205,12 +165,12 @@
 				});
 			
 			// appends year text on the svg
-			svg.append("text")
-				.attr("class", "year")
-				.attr("x", (width / 2.2))             
-				.attr("y", (height / 1.5))
-				.attr("text-anchor", "center")  
-				.style("font-size", "40px")  
+			svg.append('text')
+				.attr('class', 'year')
+				.attr('x', (width / 3.1))             
+				.attr('y', (height / 1.5))
+				.attr('text-anchor', 'center')  
+				.style('font-size', '40px')  
 				.text(nested_leaf.key);	
 
 		};
@@ -224,25 +184,25 @@
 			count = count + 1;
 			// sets a 'skip animation' button to be showed if the animation has been seen once
 			if (count > 1 ) {
-				d3.select(".svg")
-				  .append("text")
-				    .attr("class", "skip")
-					.attr('x', 260)
-					.attr('y', 41)
-				    .text("Pular animação");
+				d3.select('.svg')
+				  .append('text')
+				    .attr('class', 'skip button_text')
+					.attr('x', 100)
+					.attr('y', 37)
+				    .text('Pular animação');
 					
 				d3.select('.svg')
 				  .append('rect')
 					.attr('class', 'skip button_rect')
-					.attr('width', 130)
-					.attr('height', 30)
-					.attr("rx", 5)
-					.attr("ry", 5)
-					.attr('x', 250)
+					.attr('width', 110)
+					.attr('height', 24)
+					.attr('rx', 5)
+					.attr('ry', 5)
+					.attr('x', 90)
 					.attr('y', 20)
 					.on('click', function(d) {
 						clearInterval(year_interval);
-						button_click("2015");
+						button_click('2015');
 						set_menu();
 					});		
 			}
@@ -269,7 +229,7 @@
 				if(year_index >= years.length) {
 					clearInterval(year_interval);		
 					set_menu();	
-					d3.selectAll(".skip").remove();
+					d3.selectAll('.skip').remove();
 				}
 		    }, 500);
 		  
@@ -281,12 +241,12 @@
 			if its a year change, calls the update function
 		*/
 		function button_click(option) {
-			if (option === "Geral" || option === "Homens" || option === "Mulheres") {
+			if (option === 'Geral' || option === 'Homens' || option === 'Mulheres') {
 				gender_read = option;
 				year_read = 2015;
-				d3.selectAll("svg").remove();
-				d3.select("h2").remove();
-				d3.json("brasil_estados.json", draw);
+				d3.selectAll('svg').remove();
+				d3.select('h2').remove();
+				d3.json('brasil_estados.json', draw);
 			} else {
 				var index = +option;
 				index = index - 1996;
@@ -300,12 +260,12 @@
 		
 			// sets properties for the menu buttons
 			var button_width = 	0;			
-			var buttons_list = [{label: "Geral", x: (width/2)-3, y: height/60},
-				{label: "Homens", x: (width/2)+82, y: height/60 },
-				{label: "Mulheres", x: (width/2)+167, y: height/60 }];			
+			var buttons_list = [{label: 'Geral', x: (width/3)+42, y: height/60},
+				{label: 'Homens', x: (width/3)+117, y: height/60 },
+				{label: 'Mulheres', x: (width/3)+192, y: height/60 }];			
 			for (var i = 1996; i < 2016 ; i++) {
-				buttons_list.push({label: i, x: 250 + button_width, y: 70})
-				button_width = button_width + 55;
+				buttons_list.push({label: i, x: 10 + button_width, y: 70});
+				button_width = button_width + 47;
 			}
 			
 			var buttons_text = menu.selectAll('g')
@@ -314,14 +274,14 @@
 			  .append('text')
 				.attr('class', 'button_text')
 				.attr('x', function(d) {
-					if (d.label === "Geral") {
-						return d.x+19;
-					} else if (d.label === "Homens") {
+					if (d.label === 'Geral') {
+						return d.x+17;
+					} else if (d.label === 'Homens') {
 						return d.x+10;
 					} else return d.x+7;
 				})
 				.attr('y', function(d) {
-					return d.y+21;
+					return d.y+17;
 				})
 				.text(function(d){
 					return d.label;
@@ -336,14 +296,14 @@
 			  .append('rect')
 				.attr('class', 'button_rect')
 				.attr('width', function(d){
-					if (d.label === "Geral" || d.label === "Homens" || d.label === "Mulheres") {
-						return 80;
-					} else return 50;
+					if (d.label === 'Geral' || d.label === 'Homens' || d.label === 'Mulheres') {
+						return 70;
+					} else return 44;
 						
 				})
-				.attr('height', 30)
-				.attr("rx", 5)
-				.attr("ry", 5)
+				.attr('height', 24)
+				.attr('rx', 5)
+				.attr('ry', 5)
 				.attr('x', function(d) {
 					return d.x;
 				})
@@ -360,26 +320,26 @@
 				
 			// calls the tooltip when hovering the paths
 			svg.selectAll('path')
-				.attr("class", "tip")
-				.on("mouseover", function(d) {
+				.attr('class', 'tip')
+				.on('mouseover', function(d) {
 					div.transition()
 						.duration(400)
-						.style("opacity", .9);
-					div.html("<strong>" + d.properties.Name + "</strong>" + ": " + "<strong><span style='color:red'>" + d3.select(this).attr('v').substr(0,5) + "</span></strong>")
-						.style("left", (d3.event.pageX) + "px")
-						.style("top", (d3.event.pageY - 25) + "px");
+						.style('opacity', .9);
+					div.html('<strong>' + d.properties.Name + '</strong>' + ': ' + '<strong><span style=color:red>' + d3.select(this).attr('v').substr(0,5) + '</span></strong>')
+						.style('left', (d3.event.pageX) + 'px')
+						.style('top', (d3.event.pageY - 25) + 'px');
 				})
-				.on("mouseout", function(d) {
+				.on('mouseout', function(d) {
 					div.transition()
 					   .duration(500)
-					   .style("opacity", 0);
+					   .style('opacity', 0);
 				});
-			d3.selectAll(".skip").remove();
+			d3.selectAll('.skip').remove();
 		} 
 		 
 		// reads and models the txt datasheet
 		// than passes it to the start function to start the animation
-	    d3.tsv("taxa_homicidios.txt", start)
+	    d3.tsv('taxa_homicidios.txt', start)
 		    .row(function(d) {
 			    return {
 				  uf: d.uf,
@@ -394,12 +354,35 @@
       </script>
   </head>
 <body>
-  <script type="text/javascript">
-  /*
-    loads the JSON file
-    and passes the contents of it to the draw function
-    */
-  d3.json("brasil_estados.json", draw);
-  </script>
+  <div  id='left'>
+    <script type='text/javascript'>
+	  /*
+		loads the JSON file
+		and passes the contents of it to the draw function
+		*/
+	  d3.json('brasil_estados.json', draw);
+    </script>
+  </div>
+  <div id='right'>
+	<h3 class='text'>
+		A escalada da violência no Brasil
+	</h3>
+	<p class='just'>
+		De 1996 a 2015, a taxa de homicídios por 100 mil habitantes do Brasil aumentou mais de 17%.
+	</p>
+	<p class='just'>
+		No mapa de índice geral (considera os dois gêneros), percebe-se que, conforme o tempo passa, 
+		a intensidade das cores aumenta na maioria dos estados, principalmente do Norte e Nordeste.
+		Outros estados como São Paulo e Rio de Janeiro, que em 1996 tinham taxas altas de homicídio, 
+		conseguiram diminuí-las significativamente.
+	</p>
+	<p class='just'>
+		Além disso, nota-se a diferença gritante entre as taxas de homicídio entre os gêneros.
+	</p>
+	<p class='just'>
+		Nota: As taxas de homicídio por 100 mil habitantes dos estados são exibidas ao passar o mouse
+		sobre eles.
+	</p>
+  </div>
 </body>
 </html>
