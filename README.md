@@ -3,7 +3,10 @@ P6 - Mapa da Morte
 ===========================
 ### Por Nikolas Thorun
 
+
 #### Resumo:
+
+Clique aqui para ver: http://bl.ocks.org/nrthorun/e91fa658ce1471d4d82ad1b31df21951
 
 Esta visualização apresenta as taxas de homicídio a cada 100 mil habitantes no Brasil, registradas entre 1996 e 2015.
 É mostrada, de forma clara, que as taxas são crescentes com o tempo e que a diferença entre os gêneros é enorme.

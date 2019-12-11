@@ -18,7 +18,7 @@
 		// svg size
 		var margin = 75,
 			width = 960,
-			height = 600;
+			height = 440;
 		 
 		// color scale
 		var color = d3.scaleLinear()
@@ -39,7 +39,7 @@
 		var menu = d3.select('#left')
 		  .append('svg')
 			.attr('width', width)
-			.attr('height', (height)/6)
+			.attr('height', 60)
 		  .append('g')
 		    .attr('class', 'menu');
 		
@@ -55,7 +55,7 @@
 		// sets the projection as marcator, scales and position it inside the map svg
 		var projection = d3.geoMercator()
 			.scale(600)
-			.translate([width+width/12, height/4]);
+			.translate([width+width/12, height/7.5]);
 		
 		// sets the paths of the projection
 		var path = d3.geoPath().projection(projection);
@@ -74,7 +74,7 @@
 		var key = d3.select('.svg')
 		  .append('g')
 			.attr('class', 'legendWrapper')
-			.attr('transform', 'translate(' + (width-width/4) + ',' + (height/6) + ')');
+			.attr('transform', 'translate(' + (width-width/4.5) + ',' + (height/12) + ')');
 
 			var legend = key.append('defs')
 			  .append('svg:linearGradient')
@@ -260,11 +260,11 @@
 		
 			// sets properties for the menu buttons
 			var button_width = 	0;			
-			var buttons_list = [{label: 'Geral', x: (width/3)+42, y: height/60},
-				{label: 'Homens', x: (width/3)+117, y: height/60 },
-				{label: 'Mulheres', x: (width/3)+192, y: height/60 }];			
+			var buttons_list = [{label: 'Geral', x: (width/3)+42, y: 2},
+				{label: 'Homens', x: (width/3)+117, y: 2 },
+				{label: 'Mulheres', x: (width/3)+192, y: 2 }];			
 			for (var i = 1996; i < 2016 ; i++) {
-				buttons_list.push({label: i, x: 10 + button_width, y: 70});
+				buttons_list.push({label: i, x: 10 + button_width, y: 32});
 				button_width = button_width + 47;
 			}
 			
@@ -362,27 +362,6 @@
 		*/
 	  d3.json('brasil_estados.json', draw);
     </script>
-  </div>
-  <div id='right'>
-	<h3 class='text'>
-		A escalada da violência no Brasil
-	</h3>
-	<p class='just'>
-		De 1996 a 2015, a taxa de homicídios por 100 mil habitantes do Brasil aumentou mais de 17%.
-	</p>
-	<p class='just'>
-		No mapa de índice geral (considera os dois gêneros), percebe-se que, conforme o tempo passa, 
-		a intensidade das cores aumenta na maioria dos estados, principalmente do Norte e Nordeste.
-		Outros estados como São Paulo e Rio de Janeiro, que em 1996 tinham taxas altas de homicídio, 
-		conseguiram diminuí-las significativamente.
-	</p>
-	<p class='just'>
-		Além disso, nota-se a diferença gritante entre as taxas de homicídio entre os gêneros.
-	</p>
-	<p class='just'>
-		Nota: As taxas de homicídio por 100 mil habitantes dos estados são exibidas ao passar o mouse
-		sobre eles.
-	</p>
   </div>
 </body>
 </html>
