@@ -1,5 +1,5 @@
 
-P6 - Death Map
+P6 - The Death Map
 ===========================
 ### Author: Nikolas Thorun
 
