@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <link rel='stylesheet' type='text/css' href='style.css'/>
+    <script src='http://d3js.org/d3.v4.min.js'></script>
+    <script src='https://d3js.org/d3-scale-chromatic.v1.min.js'></script>
+    <script src='http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js'></script>
+    <script type='text/javascript'>
+	var gender_read = 'Both';
+	var year_read = 2015;
+	var nested = [];
+	var count = 0;
+	
+    function draw(data_map) {
+      
+		'use strict';
+		// svg size
+		var margin = 75,
+			width = 960,
+			height = 440;
+		 
+		// color scale
+		var color = d3.scaleLinear()
+		    .domain([0, 50, 100])
+			.range(['white', 'red', 'black']);
+		
+		// div for the tooltip - when hover over the map
+		var div = d3.select('#left').append('div')
+			.attr('class', 'tooltip')
+			.style('opacity', 0);
+		
+		// appends the menu svg to the page
+		var menu = d3.select('#left')
+		  .append('svg')
+			.attr('width', width)
+			.attr('height', 60)
+		  .append('g')
+		    .attr('class', 'menu');
+		
+		// appends the map svg to the page, groups the map inside g
+		var svg = d3.select('#left')
+		  .append('svg')
+			.attr('class','svg')
+			.attr('width', width)
+			.attr('height', height)
+		  .append('g')
+			.attr('class','map');
+		  
+		// sets the projection as marcator, scales and position it inside the map svg
+		var projection = d3.geoMercator()
+			.scale(600)
+			.translate([width+width/12, height/7.5]);
+		
+		// sets the paths of the projection
+		var path = d3.geoPath().projection(projection);
+		
+		// loads map and appends the path attr on it
+		var map = svg.selectAll('path')
+			.data(data_map.features)
+			.enter()
+		  .append('path')
+			.attr('d',path)
+			.style('fill', 'black')
+			.style('stroke', 'black')
+			.style('stroke width', 0.5);
+
+		// the next few chunks are all about setting the legend next to the map
+		var key = d3.select('.svg')
+		  .append('g')
+			.attr('class', 'legendWrapper')
+			.attr('transform', 'translate(' + (width-width/4.5) + ',' + (height/12) + ')');
+
+			var legend = key.append('defs')
+			  .append('svg:linearGradient')
+			    .attr('id', 'gradient')
+				.attr('x1', '0%')
+				.attr('y1', '0%')
+				.attr('x2', '100%')
+				.attr('y2', '0%')
+				.attr('spreadMethod', 'pad');
+
+			legend.append('stop')
+				.attr('offset', '0%')
+				.attr('stop-color', 'oldlace')
+				.attr('stop-opacity', 1);
+				
+			legend.append('stop')
+				.attr('offset', '50%')
+				.attr('stop-color', 'red')
+				.attr('stop-opacity', 1);
+				
+			legend.append('stop')
+				.attr('offset', '100%')
+				.attr('stop-color', 'black')
+				.attr('stop-opacity', 1);
+
+			key.append('rect')
+				.attr('width', width/5.8)
+				.attr('height', height/40)
+				.style('fill', 'url(#gradient)')
+				.attr('transform', 'translate(0,10)');
+			
+			key.append('text')
+				.attr('class', 'legendTitle')
+				.attr('x', 6)
+				.attr('y', 0)
+				.style('font-size', '12px')
+				.text('Homicides/100.000 people');
+				
+			var xScale = d3.scaleLinear()
+				.range([0, width/5.8])
+				.domain([0,100]);
+				
+			var xAxis = d3.axisBottom()
+				.ticks(5)  //Set rough # of ticks
+				.scale(xScale);
+
+			key.append('g')
+				.attr('class', 'axis')  //Assign 'axis' class
+				.attr('transform', 'translate(' + 0 + ',' + 22 + ')')
+				.call(xAxis);
+
+		/*
+			function called at every year change
+		*/
+		function update(nested_leaf) {
+		    // removes the text on svg showing the year
+			svg.selectAll('.year').remove();
+			
+			// sets the respective values of each state (path) 
+			// sets path attribute 'v' with the homicide rate value for each state - to be used by the tooltip
+			svg.selectAll('path')
+				.transition()
+				.duration(250)
+				.style('fill', function(d) {
+					for (var i = 0; i < nested_leaf.values.length; i++) {
+						if (nested_leaf.values[i].key === d.properties.Name){
+							if (gender_read === 'Men') return color(nested_leaf.values[i].values[0].homens);
+							else if (gender_read === 'Women') return color(nested_leaf.values[i].values[0].mulheres);
+							else return color(nested_leaf.values[i].values[0].geral);
+						}
+					} 
+				})
+				.attr('v', function(d) {
+					for (var i = 0; i < nested_leaf.values.length; i++) {
+						if (nested_leaf.values[i].key === d.properties.Name){
+							if (gender_read === 'Men') return nested_leaf.values[i].values[0].homens;
+							else if (gender_read === 'Women') return nested_leaf.values[i].values[0].mulheres;
+							else return nested_leaf.values[i].values[0].geral;
+						}
+					} 
+				});
+			
+			// highlights the selected options on the menu
+			menu.selectAll('rect')
+				.style('fill', function(d) {
+					if (d.label === gender_read) return 'gray';
+					if (d.label === year_read) return 'gray';
+				});
+			
+			// appends year text on the svg
+			svg.append('text')
+				.attr('class', 'year')
+				.attr('x', (width / 3.1))             
+				.attr('y', (height / 1.5))
+				.attr('text-anchor', 'center')  
+				.style('font-size', '40px')  
+				.text(nested_leaf.key);	
+
+		};
+		 
+		/*
+			function called at the start of each animation
+			each gender button calls the animation again
+		*/
+	    function start(data) {
+			// increments the count variable at every animation
+			count = count + 1;
+			// sets a 'skip animation' button to be showed if the animation has been seen once
+			if (count > 1 ) {
+				d3.select('.svg')
+				  .append('text')
+				    .attr('class', 'skip button_text')
+					.attr('x', 100)
+					.attr('y', 37)
+				    .text('Skip animation');
+					
+				d3.select('.svg')
+				  .append('rect')
+					.attr('class', 'skip button_rect')
+					.attr('width', 110)
+					.attr('height', 24)
+					.attr('rx', 5)
+					.attr('ry', 5)
+					.attr('x', 90)
+					.attr('y', 20)
+					.on('click', function(d) {
+						clearInterval(year_interval);
+						button_click('2015');
+						set_menu();
+					});		
+			}
+			
+			// groups the information for every year
+		    nested = d3.nest()
+			    .key(function(d) {
+					return +d.ano;
+			    })
+			    .key(function(d) {
+					return d.uf;
+			    })
+			    .entries(data);
+			
+			var years = d3.range(1996, 2016);
+		    var year_index = 0;
+
+			// calls the update function for every year
+		    var year_interval = setInterval(function() {
+				update(nested[year_index]);
+				year_index++;
+				
+				// the chunk of code below shows the menu buttons at the end of the animation
+				if(year_index >= years.length) {
+					clearInterval(year_interval);		
+					set_menu();	
+					d3.selectAll('.skip').remove();
+				}
+		    }, 500);
+		  
+	    };		
+		
+		/*
+			function called at every button click on the menu
+			if its a gender change, calls start to animate again
+			if its a year change, calls the update function
+		*/
+		function button_click(option) {
+			if (option === 'Both' || option === 'Men' || option === 'Women') {
+				gender_read = option;
+				year_read = 2015;
+				d3.selectAll('svg').remove();
+				d3.select('h2').remove();
+				d3.json('brasil_estados.json', draw);
+			} else {
+				var index = +option;
+				index = index - 1996;
+				year_read = option;
+				update(nested[index]);
+			}
+		
+		};  
+		 
+		function set_menu() {
+		
+			// sets properties for the menu buttons
+			var button_width = 	0;			
+			var buttons_list = [{label: 'Both', x: (width/3)+42, y: 2},
+				{label: 'Men', x: (width/3)+117, y: 2 },
+				{label: 'Women', x: (width/3)+192, y: 2 }];			
+			for (var i = 1996; i < 2016 ; i++) {
+				buttons_list.push({label: i, x: 10 + button_width, y: 32});
+				button_width = button_width + 47;
+			}
+			
+			var buttons_text = menu.selectAll('g')
+				.data(buttons_list)
+				.enter()
+			  .append('text')
+				.attr('class', 'button_text')
+				.attr('x', function(d) {
+					if (d.label === 'Both') {
+						return d.x+22;
+					} else if (d.label === 'Men') {
+						return d.x+22;
+					} else if (d.label === 'Women') {
+						return d.x+12;
+					}else return d.x+7;
+				})
+				.attr('y', function(d) {
+					return d.y+17;
+				})
+				.text(function(d){
+					return d.label;
+				}).on('click', function(d) {
+					button_click(d.label);
+				});	
+	
+	
+			var buttons_rect = menu.selectAll('g')
+				.data(buttons_list)
+				.enter()
+			  .append('rect')
+				.attr('class', 'button_rect')
+				.attr('width', function(d){
+					if (d.label === 'Both' || d.label === 'Men' || d.label === 'Women') {
+						return 70;
+					} else return 44;
+						
+				})
+				.attr('height', 24)
+				.attr('rx', 5)
+				.attr('ry', 5)
+				.attr('x', function(d) {
+					return d.x;
+				})
+				.attr('y', function(d) {
+					return d.y;
+				})
+				.style('fill', function(d) {
+					if (d.label === gender_read) return 'gray';
+					if (d.label === year_read) return 'gray';
+				})
+				.on('click', function(d) {
+					button_click(d.label);
+				});	
+				
+			// calls the tooltip when hovering the paths
+			svg.selectAll('path')
+				.attr('class', 'tip')
+				.on('mouseover', function(d) {
+					div.transition()
+						.duration(400)
+						.style('opacity', .9);
+					div.html('<strong>' + d.properties.Name + '</strong>' + ': ' + '<strong><span style=color:red>' + d3.select(this).attr('v').substr(0,5) + '</span></strong>')
+						.style('left', (d3.event.pageX) + 'px')
+						.style('top', (d3.event.pageY - 25) + 'px');
+				})
+				.on('mouseout', function(d) {
+					div.transition()
+					   .duration(500)
+					   .style('opacity', 0);
+				});
+			d3.selectAll('.skip').remove();
+		} 
+		 
+		// reads and models the txt datasheet
+		// than passes it to the start function to start the animation
+	    d3.tsv('taxa_homicidios.txt', start)
+		    .row(function(d) {
+			    return {
+				  uf: d.uf,
+			      ano: +d.ano,
+				  geral: +d.geral,
+				  homens: +d.homens,
+				  mulheres: +d.mulheres
+			    };
+			});
+
+	};
+      </script>
+  </head>
+<body>
+  <div  id='left'>
+    <script type='text/javascript'>
+	  /*
+		loads the JSON file
+		and passes the contents of it to the draw function
+		*/
+	  d3.json('brasil_estados.json', draw);
+    </script>
+  </div>
+</body>
+</html>

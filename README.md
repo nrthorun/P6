@@ -1,55 +1,55 @@
 
-P6 - Mapa da Morte
+P6 - Death Map
 ===========================
-### Por Nikolas Thorun
+### Author: Nikolas Thorun
 
 
-#### Resumo:
+#### Abstract:
 
-Clique aqui para ver: http://bl.ocks.org/nrthorun/e91fa658ce1471d4d82ad1b31df21951
+Click here to check it out: http://bl.ocks.org/nrthorun/e91fa658ce1471d4d82ad1b31df21951
 
-Esta visualização apresenta as taxas de homicídio a cada 100 mil habitantes no Brasil, registradas entre 1996 e 2015.
-É mostrada, de forma clara, que as taxas são crescentes com o tempo e que a diferença entre os gêneros é enorme.
-Os dados foram retirados do 'Atlas da Violência' no site do IPEA, o Instituto de Pesquisa Econômica Aplicada (http://www.ipea.gov.br/atlasviolencia/series).
-A animação começa mostrando um mapa coroplético do Brasil, no qual a intensidade da cor indica o valor da taxa de homicídio, iterando entre os anos a cada meio segundo.
-Após o término da animação, um menu aparece com as opções de ver a animação para diferentes gêneros ou detalhar algum ano específico.
-Se uma nova animação for selecionada, um botão de 'pular animação' é mostrado.
+This visualization shows the homicide rates for every 100 thousand inhabitants in Brazil, registered between 1996 and 2015.
+It is clearly shown that the rates are increasing over time and that the difference between genders is huge.
+The data were taken from the 'Atlas of Violence' on the IPEA website, the Institute for Applied Economic Research (http://www.ipea.gov.br/atlasviolencia/series).
+The animation begins by showing a choroplethic map of Brazil, in which the color intensity indicates the value of the homicide rate, iterating between the years every half a second.
+After the end of the animation, a menu appears with the options to see the animation for different genres or to detail a specific year.
+If a new animation is selected, a 'skip animation' button is shown.
 
 #### Design:
 
-Para representar o 'mapa da morte' foi escolhido um mapa coroplético, no qual a escala de cores varia de branco a vermelho e depois a preto.
-A escala é sequencial, ou seja, conforme a taxa aumenta, os tons escurecem.
-A ideia é que estados sem homicidios ficassem brancos, estados com mais de 100 homicídios por 100 mil habitantes focassem pretos e o restante dos estados variassem entre rosa claro e vermelho escuro.
-Após os feedbacks, o título foi alterado de 'Mapa da Violência' para 'Mapa da Morte (Homicídios)', para não passar a ideia de que o mapa representava outros tipos de violência.
+To represent the 'death map', a choropleth map was chosen, in which the color scale varies from white to red and then to black.
+The scale is sequential, that is, as the rate increases the tones darken.
+The idea is that states without homicides would turn white, states with more than 100 homicides per 100,000 inhabitants would turn black and the rest of the states would range from light pink to dark red.
+After the feedbacks, the title was changed from 'Map of Violence' to 'Map of Death (Homicides)', so as not to pass on the idea that the map represented other types of violence.
 
 #### Feedback:
 
-Várias pessoas assistiram e interagiram com a visualização, a maioria delas disse que não tinha pontos de melhorias a indicar.
+Several people watched and interacted with the visualization, most of whom said they had no points for improvement to indicate.
 
-Quatro feedbacks foram dados:
+Four feedbacks were given:
 
-1 - Meu irmão Peter, o primeiro a quem mostrei a visualização, reclamou que a animação estava muito lenta e que ninguém tem este tempo para assistí-la hoje em dia.
-O feedback foi aceito e implementado. Os próximos feedbacks foram dados após essa modificação.
+1 - My brother Peter, the first to whom I showed the visualization, complained that the animation was too slow and that nobody has the time to watch it nowadays.
+Feedback was accepted and implemented. The next feedbacks were given after this change.
 
-2 - Minha namorada Natália reclamou que a animação estava muito rápida e que o título confunde e passa uma ideia errada.
-O feedback do título foi aceito e implementado. O feedback do tempo de animação não foi aceito, pois as outras pessoas não concordaram.
+2 - My girlfriend Natália complained that the animation was too fast and that the title is confusing and gives the wrong idea.
+The title feedback was accepted and implemented. The feedback from the animation time was not accepted as the other people did not agree.
 
-3 - Meu chefe Thiago, que é um baita analista de dados, disse que a visualização já mostra dos os dados que ele quer ver, mas seria interessante abrir um gráfico de linha mostrando a evolução da taxa no tempo quando clicássemos em algum estado.
-O feedback foi aceito, mas não foi implementado por entender que daria muito trabalho para mostrar dados que o mapa já mostra, porém de outra forma. Mas a ideia é boa será implementada em um segundo momento.
+3 - My boss Thiago, who is a great data analyst, said that the visualization already shows the data he wants to see, but it would be interesting to open a line graph showing the evolution of the rate over time when we click on any state.
+The feedback was accepted, but it was not implemented because it understood that it would take a lot of work to show data that the map already shows, but in another way. But the idea is good will be implemented in a second moment.
 
-4 - Meu amigo André falou que seria interessante ter um botão de 'pular animação' para que não fossemos obrigados a assistir as animações todas as vezes que clicássemos nos botões de gênero.
-O feedback foi aceito e implementado.
+4 - My friend André said that it would be interesting to have a 'skip animation' button so that we would not be forced to watch the animations every time we clicked on the genre buttons.
+Feedback was accepted and implemented.
 
-#### Recursos:
+#### Resources:
 
-Para ajudar na construção da visualização, foram pesquisadas as seguintes fontes:
+To help build the visualization, the following sources were searched:
 
 Tooltip:
 http://bl.ocks.org/Caged/6476579
 
-Exemplo de mapa coroplético:
+Example of a choropletic map:
 https://bl.ocks.org/mbostock/4060606
 
-Legenda:
+Legend:
 https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient.html
 http://bl.ocks.org/darrenjaworski/5397362
